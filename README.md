@@ -2,7 +2,7 @@
 
 Open FE is lua script designed for using, listing, archiving, and publicize lua script, efficiently.
 
-It's distributed under the GNU General Public License v2 (or any later version) - see the accompanying [LICENSE](https://github.com/Sylixe/Open-FE/blob/main/LICENSE) file for more details.
+It's distributed under the GNU General Public License v2 - see the accompanying [LICENSE](https://github.com/Sylixe/Open-FE/blob/main/LICENSE) file for more details.
 
 ## Usage
 
