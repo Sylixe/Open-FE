@@ -1,4 +1,4 @@
-local repo = "bainchild/Open-FE"
+local repo = "Sylixe/Open-FE"
 
 
 local function jdc(c)
