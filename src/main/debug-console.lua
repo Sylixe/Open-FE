@@ -1,4 +1,4 @@
-local repo = "bainchild/Open-FE"
+local repo = "bainchild/Open-FE/branches/dev"
 
 
 local function jdc(c)
@@ -7,32 +7,93 @@ end
 local function jde(c)
     return game:GetService("HttpService"):JSONEncode(c)
 end
-local function getcommits(gh)
-    local commits = syn.request({
-    Url="https://api.github.com/repos/"..gh.."/commits";
+--[[
+local abc = syn.request({
+    Url="https://api.github.com/repos/"..repo.."/commits";
     Method="GET";
-    })
-    assert(commits.Success,"Couldn't get commits for "..tostring(gh))
-    return jdc(commits.Body)
+})
+print(abc.Success)
+if abc.Success then
+    local jdcc = jdc(abc.Body)
+    for i,v in pairs(jdcc) do 
+        print(i,v)
+        if type(v) == "table" then 
+            for i2,v2 in pairs(v) do 
+                print("\t\t\t\t\t",i2,v2)
+                if type(v2) == "table" then 
+                    for i3,v3 in pairs(v2) do 
+                        print("\t\t\t\t\t\t\t",i3,v3)
+                    end
+                end
+            end
+        end
+    end
+else
+    print(abc.SatusCode)
+    print(abc.Body)
 end
-local function getlatestcommit(gh)
-    local ta = getcommits(gh)
+
+if true then return end]]
+local function getcommits(gh,br)
+    if br then 
+        local commits = syn.request({
+            Url="https://api.github.com/repos/"..gh;
+            Method="GET";
+        })
+        assert(commits.Success,"Couldn't get commits for "..tostring(gh))
+        return jdc(commits.Body)
+    else
+        local commits = syn.request({
+            Url="https://api.github.com/repos/"..gh.."/commits";
+            Method="GET";
+        })
+        assert(commits.Success,"Couldn't get commits for "..tostring(gh))
+        return jdc(commits.Body)
+    end
+end
+local function getlatestcommit(gh,branch)
+    local ta = getcommits(gh,branch)
     return ta[1]
 end
-local function gettree(gh,cm,aurl)
+local function gettree(gh,cm,aurl,branch)
     local turl
     if not aurl then
-        cm = cm or getlatestcommit(gh)
+        cm = cm or getlatestcommit(gh,branch)
         local commit_info
         if type(cm) == "string" then 
-            commit_info = syn.request({
-                Url="https://api.github.com/repos/"..gh.."/commits/"..cm;
-                Method="GET";
-            })
-            assert(commit_info.Success,"Couldn't get commit info for "..tostring(cm))
-            commit_info = jdc(commit_info.Body)
+            if branch then 
+                commit_info = syn.request({
+                    Url="https://api.github.com/repos/"..gh;
+                    Method="GET";
+                })
+                assert(commit_info.Success,"Couldn't get commit info for "..tostring(cm))
+                commit_info = jdc(commit_info.Body)
+                for i,v in pairs(commit_info.commit) do 
+                    if v.sha == cm then
+                        commit_info=v
+                        break
+                    end
+                end
+                assert(commit_info~=jdc(commit_info.Body),"Couldn't get commit '"..tostring(cm).."'")
+            else
+                commit_info = syn.request({
+                    Url="https://api.github.com/repos/"..gh.."/commits/"..cm;
+                    Method="GET";
+                })
+                assert(commit_info.Success,"Couldn't get commit info for "..tostring(cm))
+                commit_info = jdc(commit_info.Body)
+            end
         else
-            commit_info=cm
+            if branch then
+                commit_info = syn.request({
+                    Url="https://api.github.com/repos/"..gh;
+                    Method="GET";
+                })
+                assert(commit_info.Success,"Couldn't get commit info for "..tostring(cm))
+                commit_info = jdc(commit_info.Body).commit
+            else
+                commit_info = cm
+            end
         end
         turl=commit_info.commit.tree.url
     else
@@ -45,7 +106,7 @@ local function gettree(gh,cm,aurl)
     assert(tree_request.Success,"Couldn't get tree for "..tostring(cm))
     return jdc(tree_request.Body).tree
 end
-repo=gettree(repo,nil,false)
+repo=gettree(repo,nil,false,true)
 for i,v in ipairs(repo) do
     if v.type == "tree" and v.path == "src" then
         repo=v.url
