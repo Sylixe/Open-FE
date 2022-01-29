@@ -1,0 +1,1 @@
+print("Game Hub: Coming soon.")
