@@ -7,7 +7,6 @@ end
 local function jde(c)
     return game:GetService("HttpService"):JSONEncode(c)
 end
-
 --[[
 local abc = syn.request({
     Url="https://api.github.com/repos/"..repo.."/commits";
@@ -159,18 +158,22 @@ while true do
     elseif options[tonumber(n)] == nil then
         rconsoleprint("Out of range!\n")
     else
-        local tree_d = gettree(options[tonumber(n)].url,nil,true)
-        for i,v in pairs(tree_d) do
-            if v.type == "blob" and v.path == "init.lua" then
-                tree_d=loadstring(syn.crypt.base64.decode(jdc(game:HttpGet(v.url)).content))
-                break
+        if options[tonumber(n)]:lower() == "exit" then 
+            break
+        else
+            local tree_d = gettree(options[tonumber(n)].url,nil,true)
+            for i,v in pairs(tree_d) do
+                if v.type == "blob" and v.path == "init.lua" then
+                    tree_d=loadstring(syn.crypt.base64.decode(jdc(game:HttpGet(v.url)).content))
+                    break
+                end
             end
+            assert(tree_d~=nil,"Chosen option doesn't have a init.lua file (or its invalid lua)!")
+            chosen=tree_d
+            break
         end
-        assert(tree_d~=nil,"Chosen option doesn't have a init.lua file (or its invalid lua)!")
-        chosen=tree_d
-        break
     end
 end
 rconsoleclear()
 rconsolename(identifyexecutor()) -- it was something like identifyexploit() or identifyexecutor()
-chosen()
+if chosen then chosen() end
